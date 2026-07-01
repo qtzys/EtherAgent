@@ -1,0 +1,50 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ===== 虚拟环境 =====
+venv/
+env/
+.venv/
+ENV/
+
+# ===== 凭证 / 环境（绝不进 git）=====
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ===== SQLite 数据库（含会话记忆 + 信念 + 审计日志）=====
+agent.db
+agent.db-shm
+agent.db-wal
+
+# ===== 日志 =====
+*.log
+logs/
+
+# ===== 编辑器 =====
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ===== Node（如果以后前端加依赖）=====
+node_modules/
+dist/
+build/
+
+# ===== 测试产物 =====
+.coverage
+htmlcov/
+.tox/
