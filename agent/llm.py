@@ -150,8 +150,10 @@ class RealLLM(LLM):
     """
 
     # ---------- 默认配置 ----------
-    DEFAULT_MODEL = "claude-sonnet-4-6"
-    DEFAULT_BASE_URL = None   # None = 用 anthropic 官方
+    # 用户实际使用 MiniMax 系列：默认走 MiniMax 的 Anthropic 兼容端点
+    # key 仍通过 ANTHROPIC_API_KEY env var 注入（绝不进 git / 代码）
+    DEFAULT_MODEL = "MiniMax-M3"
+    DEFAULT_BASE_URL = "https://api.minimaxi.com/anthropic"
     DEFAULT_MAX_TOKENS = 4096
 
     # ---------- 决策 Prompt 模板 ----------
