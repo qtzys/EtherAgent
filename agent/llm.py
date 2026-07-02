@@ -237,12 +237,30 @@ class RealLLM(LLM):
         )
 
         try:
-            message = client.messages.create(
+            # 使用 streaming 模式（MiniMax-M3 强制要求 streaming）
+            text_content = ""
+            with client.messages.stream(
                 model=self.model,
                 max_tokens=self.max_tokens,
                 system=self.SYSTEM_PROMPT,
                 messages=[{"role": "user", "content": user_msg}],
-            )
+            ) as stream:
+                for event in stream:
+                    # 累积 text 块
+                    if hasattr(event, "type"):
+                        if event.type == "content_block_delta":
+                            delta = getattr(event, "delta", None)
+                            if delta and getattr(delta, "type", None) == "text_delta":
+                                text_content += getattr(delta, "text", "")
+                # 兜底：用 get_final_message 提取完整文本
+                try:
+                    final = stream.get_final_message()
+                    if not text_content:
+                        for block in final.content:
+                            if block.type == "text":
+                                text_content += block.text
+                except Exception:
+                    pass
         except Exception as e:
             # 网络错误 / 鉴权失败 → 返回 fail
             return Decision(
@@ -251,13 +269,7 @@ class RealLLM(LLM):
                 confidence=0.0,
             )
 
-        # 解析返回：可能含 thinking + text
-        text_content = ""
-        for block in message.content:
-            if block.type == "text":
-                text_content += block.text
-
-        # 从 text 中提取 JSON
+        # text_content 已在上方累积；从 text 中提取 JSON
         decision = self._parse_decision(text_content)
         decision.reasoning = (
             f"[{self.model}] {decision.reasoning or '无 reasoning'}"
